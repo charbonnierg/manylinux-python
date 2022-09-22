@@ -1,0 +1,11 @@
+FROM debian:stretch-slim@sha256:1cb76d0577ff4a0b1f1f5fba57ec998b19cddd06b5637f236730ecb36c383f85
+
+ENV PLATFORM="linux/arm/v7"
+
+RUN mkdir -p /opt/python
+
+COPY tools/manylinux-bootstrap /opt/python/manylinux-bootstrap
+
+RUN /opt/python/manylinux-bootstrap
+
+COPY tools/manylinux-2-24 /usr/local/bin/manylinux-2-24

@@ -1,0 +1,11 @@
+FROM centos:7@sha256:1cef7b00a46a2a90c62eef9a9707d01d19c2f5e253b7ccc574ccaa775063d7e0
+
+ENV PLATFORM="linux/arm/v7"
+
+RUN mkdir -p /opt/python
+
+COPY tools/manylinux-bootstrap /opt/python/manylinux-bootstrap
+
+RUN /opt/python/manylinux-bootstrap
+
+COPY tools/manylinux-2014 /usr/local/bin/manylinux-2014
