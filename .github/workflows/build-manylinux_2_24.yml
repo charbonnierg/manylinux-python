@@ -25,4 +25,4 @@ jobs:
       - name: Build and push
         run: |
           cd manylinux_2_24/
-          ./build.sh {{ matrix.platform }}
+          ./build.sh ${{ matrix.platform }}
