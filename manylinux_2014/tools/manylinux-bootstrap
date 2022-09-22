@@ -62,7 +62,8 @@ function installPython() {
     && wget https://www.python.org/ftp/python/$VERS/Python-$VERS.tgz -O /tmp/Python-$VERS.tgz \
     && tar -xzf /tmp/Python-$VERS.tgz -C /tmp \
     && cd /tmp/Python-$VERS \
-    && ./configure \
+    && LDFLAGS="${LDFLAGS} -Wl,-rpath=/usr/local/lib/ssl/lib" \
+        ./configure \
         --prefix=$PREFIX \
         --with-ensurepip=upgrade \
         --disable-ipv6 \

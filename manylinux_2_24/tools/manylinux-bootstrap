@@ -21,7 +21,9 @@ function installDependencies() {
         libpcap-dev \
         libreadline-dev \
         libsqlite3-dev \
+        libssl-dev \
         linux-kernel-headers \
+        openssl \
         uuid-dev \
         wget \
         zlib1g-dev \
@@ -35,8 +37,8 @@ function installOpenSSL() {
     && tar -xzf /tmp/openssl-1.1.1q.tar.gz -C /tmp \
     && cd /tmp/openssl-1.1.1q \
     && ./Configure "linux-$ARCH" --prefix=/usr/local/lib/ssl \
-    && make -j8 \
-    && make -j8 install \
+    && make -j4 \
+    && make -j4 install \
     && cd - \
     && rm -rf /tmp/openssl-1.1.1q.tar.gz /tmp/openssl-1.1.1q
 }
@@ -59,15 +61,16 @@ function installPython() {
     && wget https://www.python.org/ftp/python/$VERS/Python-$VERS.tgz -O /tmp/Python-$VERS.tgz \
     && tar -xzf /tmp/Python-$VERS.tgz -C /tmp \
     && cd /tmp/Python-$VERS \
-    && ./configure \
+    && LDFLAGS="${LDFLAGS} -Wl,-rpath=/usr/local/lib/ssl/lib" \
+        ./configure \
         --prefix=$PREFIX \
         --with-ensurepip=upgrade \
         --disable-ipv6 \
         --with-openssl=/usr/local/lib/ssl \
         --with-openssl-rpath=auto \
-    && make -j8 \
-    && make -j8 install \
-    && rm -rf Python-$VERS.tgz Python-$VERS $PREFIX/share \
+    && make -j4 \
+    && make -j4 install \
+    && rm -rf $PREFIX/share \
     && find $PREFIX -depth \( -type d -a -name test -o -name tests \) | xargs rm -rf \
     && find $PREFIX -type f -a \( -name '*.pyc' -o -name '*.pyo' \) -delete \
     && $PREFIX/bin/python3 -m pip install -U --no-cache-dir \
