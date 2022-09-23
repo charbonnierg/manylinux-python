@@ -15,6 +15,16 @@ function build() {
         .
 }
 
+function showHelp() {
+    echo -e "Build docker images which can be use to create manylinux_2_24 wheels\n"
+    echo -e "Example usages:"
+    echo -e "  ./build.sh linux/amd64"
+    echo -e "  ./build.sh linux/arm64"
+    echo -e "  ./build.sh linux/arm/v7"
+    echo -e "\nThis command can also be used to build a manifest:\n"
+    echo -e "  ./build.sh manifest"
+}
+
 
 function main() {
 
@@ -49,13 +59,11 @@ function main() {
             ;;
 
         --help)
-            echo -e "Build docker images which can be use to create manylinux_2_24 wheels\n"
-            echo -e "Example usages:"
-            echo -e "  ./build.sh linux/amd64"
-            echo -e "  ./build.sh linux/arm64"
-            echo -e "  ./build.sh linux/arm/v7"
-            echo -e "\nThis command can also be used to build a manifest:\n"
-            echo -e "  ./build.sh manifest"
+            showHelp
+            ;;
+
+        -h)
+            showHelp
             ;;
 
         *)

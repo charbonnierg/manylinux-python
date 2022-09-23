@@ -36,11 +36,12 @@ function installOpenSSL() {
     wget "https://www.openssl.org/source/openssl-1.1.1q.tar.gz" -O "/tmp/openssl-1.1.1q.tar.gz" \
     && tar -xzf /tmp/openssl-1.1.1q.tar.gz -C /tmp \
     && cd /tmp/openssl-1.1.1q \
-    && ./Configure "linux-$ARCH" --prefix=/usr/local/lib/ssl \
+    && ./Configure "linux-$ARCH" --prefix=/usr/local/ssl \
     && make -j4 \
     && make -j4 install \
     && cd - \
-    && rm -rf /tmp/openssl-1.1.1q.tar.gz /tmp/openssl-1.1.1q
+    && rm -rf /tmp/openssl-1.1.1q.tar.gz /tmp/openssl-1.1.1q \
+    && rm -f /usr/local/ssl/share/doc /usr/local/ssl/share/man
 }
 
 function installPatchelf() {
@@ -61,12 +62,12 @@ function installPython() {
     && wget https://www.python.org/ftp/python/$VERS/Python-$VERS.tgz -O /tmp/Python-$VERS.tgz \
     && tar -xzf /tmp/Python-$VERS.tgz -C /tmp \
     && cd /tmp/Python-$VERS \
-    && LDFLAGS="${LDFLAGS} -Wl,-rpath=/usr/local/lib/ssl/lib" \
+    && LDFLAGS="${LDFLAGS} -Wl,-rpath=/usr/local/ssl/lib" \
         ./configure \
         --prefix=$PREFIX \
         --with-ensurepip=upgrade \
         --disable-ipv6 \
-        --with-openssl=/usr/local/lib/ssl \
+        --with-openssl=/usr/local/ssl \
         --with-openssl-rpath=auto \
     && make -j4 \
     && make -j4 install \
@@ -90,6 +91,10 @@ function installAllPythonVersions() {
     installPython 3.8.14 cp38-cp38m
     installPython 3.9.14 cp39-cp39m
     installPython 3.10.7 cp310-cp310m
+    ln -s /opt/python/cp37-cp37m/bin/python3 /usr/local/bin/python3.7
+    ln -s /opt/python/cp38-cp38m/bin/python3 /usr/local/bin/python3.8
+    ln -s /opt/python/cp39-cp39m/bin/python3 /usr/local/bin/python3.9
+    ln -s /opt/python/cp310-cp310m/bin/python3 /usr/local/bin/python3.10
 }
 
 

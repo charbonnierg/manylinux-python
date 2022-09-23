@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 
 function setPythonInterpreter() {
-
-    PYTHON_VERSION=${PYTHON_VERSION}
 
     case "$PYTHON_VERSION" in
         3.7)
@@ -61,18 +61,23 @@ function buildWheel() {
     setPythonInterpreter
     # Configure wheel platform
     setPlatform
+    echo -e "Using python interpreter: ${PYTHON_INTERPRETER}"
     # Wheels are all stored in /wheelhouse directory
     mkdir -p /wheelhouse
     # Create a temporary directory to store wheels
     TMP_WHEEL_DIR=$(mktemp -d)
     # Generate wheels
-    $PYTHON_INTERPRETER -m pip wheel --wheel-dir $TMP_WHEEL_DIR $@
+    $PYTHON_INTERPRETER -m pip wheel --wheel-dir=$TMP_WHEEL_DIR $@
     # Copy wheels which are not platform wheels
-    for wheel in $TMP_WHEEL_DIR/*-none-any.whl; do
+    for wheel in $(ls -1 $TMP_WHEEL_DIR/*-none-any.whl 2>/dev/null || true); do
+        mv $wheel /wheelhouse/.
+    done
+    # Copy wheels which are already manylinux wheels
+    for wheel in $(ls -1 $TMP_WHEEL_DIR/*-manylinux*.whl 2>/dev/null || true); do
         mv $wheel /wheelhouse/.
     done
     # Repair wheels which are platform wheels
-    for wheel in $TMP_WHEEL_DIR/*.whl; do
+    for wheel in $(ls -1 $TMP_WHEEL_DIR/*.whl 2>/dev/null || true); do
         $PYTHON_INTERPRETER -m auditwheel repair $wheel --wheel-dir /wheelhouse --plat $WHEEL_PLATFORM
     done
     # Clean up
@@ -91,10 +96,13 @@ function main() {
             showHelp
             ;;
         *)
-            if [ -z ${PYTHON_VERSION+x} ]; then
-                buildWheel $@
+            if [ -v ${PYTHON_VERSION:-""} ]; then
+                echo -e "Building wheel for python $PYTHON_VERSION"
+                PYTHON_VERSION=$PYTHON_VERSION buildWheel $@
             else
+                echo -e "Iterating over python versions"
                 for version in 3.7 3.8 3.9 3.10; do
+                    echo -e "Building wheel for python $version"
                     PYTHON_VERSION=$version buildWheel $@
                 done
             fi
